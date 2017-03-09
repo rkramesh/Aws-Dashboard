@@ -8,7 +8,11 @@
 <div class="container-fluid"><div class="navbar"><div class="navbar-inner"><div class="container"><a class="brand">Welcome to Helix AWS Dashboard</a>
     <ul class="nav">
     <li class="divider-vertical"></li>
+    <li class="active"><a href="/">IAM</a></li>
+    <li class="divider-vertical"></li>
     <li class="active"><a href="/">EC2</a></li>
+    <li class="divider-vertical"></li>
+    <li class="active"><a href="/">CloudTrial</a></li>
     <li class="divider-vertical"></li>
 	</ul>
     </div>
@@ -18,7 +22,7 @@
 
 {% for dict in list %}
 <div class="row-fluid">
-    <div class="span4 offset1" align="center">
+    <div class="span4 offset1" align="centre">
 	<span class="label label-info">{{dict['region']}}</span></br>
 	<p>
 		<table class="table table-striped">
