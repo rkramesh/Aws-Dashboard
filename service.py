@@ -112,6 +112,7 @@ def delete_elastic_ip(region=None,ip=None):
 
 @app.route('/instance_events/<region>/')
 def instance_events(region=None):
+        Ntag=(lambda x: 'Name not Assigned' if x is None else x[0]['Value'])
         ##	creds = config.get_ec2_conf()
         ##	conn = connect_to_region(region, aws_access_key_id=creds['AWS_ACCESS_KEY_ID'], aws_secret_access_key=creds['AWS_SECRET_ACCESS_KEY'])
         ##	instances = conn.get_all_instance_status()
@@ -124,7 +125,7 @@ def instance_events(region=None):
         ec2 = boto3.resource('ec2', region_name=region)
         instances = ec2.instances.filter()
         for i in instances:
-                event_info = { 'instance_id' : i.id, 'State' : i.state['Name'], 'Region' : i.placement['AvailabilityZone'], 'Public_DNS' : i.public_ip_address, 'Private_DNS': i.private_ip_address }
+                event_info = { 'instance_id' : i.id, 'State' : i.state['Name'], 'Region' : i.placement['AvailabilityZone'], 'Public_DNS' : i.public_ip_address, 'Private_DNS': i.private_ip_address, 'Name' : Ntag(i.tags) }
                 instance_event_list.append(event_info)
         return render_template('instance_events.html', instance_event_list=instance_event_list)
 			
