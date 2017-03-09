@@ -5,27 +5,23 @@ import boto.ec2.elb
 import boto
 import boto3
 from boto.ec2 import *
-
-
 app = Flask(__name__)
-
-
 @app.route('/')
 def index():
-
         list = []
         creds = config.get_ec2_conf()
-
         for region in config.region_list():
+                ec2 = boto3.client('ec2', region)
+                resp = ec2.describe_availability_zones()
+#                zones=[d['ZoneName'] for d in resp['AvailabilityZones'] if d['ZoneName']]
+                zones=[d for d in resp['AvailabilityZones'] if d['ZoneName']]
                 ec2 = boto3.resource('ec2', region_name=region)
                 instances = ec2.instances.filter()
                 instances=[i.id for i in instances]
                 ebs =[ volume for instance in ec2.instances.all() for volume in instance.volumes.all()]
                 ebscount = len(ebs)
                 instance_count = len(instances)
-
                 
-
                 
         ##		instance_count = len(instances)
         ##		ebs = conn.get_all_volumes()
@@ -57,7 +53,7 @@ def index():
         ##		elb = connelb.get_all_load_balancers()
         ##		elb_count = len(elb)
         ##		list.append({ 'region' : region, 'zones': zones, 'instance_count' : instance_count, 'ebscount' : ebscount, 'unattached_ebs' : unattached_ebs, 'eli_count' : eli_count, 'unattached_eli' : unattached_eli, 'elb_count' : elb_count, 'event_count' : event_count})
-                list.append({ 'region' : region, 'instance_count' : instance_count, 'unattached_ebs' : unattached_ebs, 'unattached_eli' : unattached_eli})
+                list.append({ 'region' : region, 'zones': zones, 'instance_count' : instance_count, 'unattached_ebs' : unattached_ebs, 'unattached_eli' : unattached_eli})
         ##		
         return render_template('index.html',list=list)
 ##        return 'hi'       
@@ -113,15 +109,7 @@ def delete_elastic_ip(region=None,ip=None):
 @app.route('/instance_events/<region>/')
 def instance_events(region=None):
         Ntag=(lambda x: 'Name not Assigned' if x is None else x[0]['Value'])
-        ##	creds = config.get_ec2_conf()
-        ##	conn = connect_to_region(region, aws_access_key_id=creds['AWS_ACCESS_KEY_ID'], aws_secret_access_key=creds['AWS_SECRET_ACCESS_KEY'])
-        ##	instances = conn.get_all_instance_status()
         instance_event_list = []
-        ##	for instance in instances:
-        ##		event = instance.events
-        ##		if event:
-        ##			event_info = { 'instance_id' : instance.id, 'event' : instance.events[0].code, 'description' : instance.events[0].description, 'event_before' : instance.events[0].not_before, 'event_after': instance.events[0].not_after }
-        ##			instance_event_list.append(event_info)
         ec2 = boto3.resource('ec2', region_name=region)
         instances = ec2.instances.filter()
         for i in instances:

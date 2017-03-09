@@ -30,7 +30,11 @@
 		{{instance_event['instance_id']}}
 		</td>
 		<td>
-		{{instance_event['State']}}
+                {% if instance_event['State'] == 'stopped' %}
+                <a href="/instance_events/{{instance_event['State']}}"><button class="btn btn-mini btn-danger" type="button">{{instance_event['State']}}</button></a>
+                {% else %}
+                <a href="/instance_events/{{instance_event['State']}}"><button class="btn btn-mini btn-success" type="button">{{instance_event['State']}}</button></a>
+                {% endif %}
 		</td>
 		<td>
 		{{instance_event['Region']}}

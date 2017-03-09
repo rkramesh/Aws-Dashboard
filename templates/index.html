@@ -24,9 +24,9 @@
 		<table class="table table-striped">
 		{% for zone in dict['zones'] %}
 		<tr>
-		<td>{{zone}}</td>
+		<td>{{zone['ZoneName']}}</td>
 		<td>
-		{% if zone.state == 'available' %} <button class="btn btn-mini btn-primary" type="button">H</button>
+		{% if zone['State'] == 'available' %} <button class="btn btn-mini btn-success" type="button">A</button>
 		{% else %}
 		<button class="btn btn-mini btn-danger" type="button">X</button>
 		{% endif %}
@@ -48,7 +48,7 @@
 	{% if dict['event_count'] == 0 %}
 	<button class="btn btn-mini btn-primary" type="button">{{dict['instance_count']}}</button>	
 	{% else %}
-	<a href="/instance_events/{{dict['region']}}"><button class="btn btn-mini btn-danger" type="button">{{dict['instance_count']}}</button></a>
+	<a href="/instance_events/{{dict['region']}}"><button class="btn btn-mini btn-primary" type="button">{{dict['instance_count']}}</button></a>
 	{% endif %}
 	</td>
 	<td>
