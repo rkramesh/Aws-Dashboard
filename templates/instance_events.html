@@ -22,7 +22,7 @@
 	<p>
 		<table class="table table-striped">
 		<tr style="font-weight:bold">
-		<td>Instance ID</td><td>State</td><td>Region</td><td>Public DNS</td><td>Private DNS</td>
+		<td>Instance ID</td><td>State</td><td>Region</td><td>Public DNS</td><td>Private DNS</td><td>Type</td><td>Name</td>
 		</tr>
 		{% for instance_event in instance_event_list %}
 		<tr>
@@ -40,6 +40,9 @@
 		</td>
 		<td>
 		{{instance_event['Private_DNS']}}
+		</td>
+		<td>
+		{{instance_event['Type']}}
 		</td>
 		<td>
 		{{instance_event['Name']}}
