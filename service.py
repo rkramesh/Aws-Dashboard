@@ -127,7 +127,8 @@ def instance_events(region=None):
         for i in instances:
                 event_info = { 'instance_id' : i.id, 'State' : i.state['Name'], 'Region' : i.placement['AvailabilityZone'], 'Public_DNS' : i.public_ip_address, 'Private_DNS' : i.private_ip_address, 'Type': i.instance_type,'Name' : Ntag(i.tags) }
                 instance_event_list.append(event_info)
-        return render_template('instance_events.html', instance_event_list=instance_event_list)
+                instflist=sorted(instance_event_list, key=lambda sortid: sortid[1])
+        return render_template('instance_events.html', instance_event_list=instflist)
 			
 if __name__ == '__main__':
 	app.debug = True
