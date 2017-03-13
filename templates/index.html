@@ -19,10 +19,13 @@
     </div>
 	</div>
 	</div>
+ <div class="span11 offset12" align="center">
+        <a href="/instance_events/All"><button class="btn btn-mini btn-primary" type="button">All Instances</button></a></br>
+ </div>
 
 {% for dict in list %}
 <div class="row-fluid">
-    <div class="span4 offset1" align="centre">
+    <div class="span4 offset1" align="center"> 
 	<span class="label label-info">{{dict['region']}}</span></br>
 	<p>
 		<table class="table table-striped">
@@ -49,8 +52,8 @@
 	</tr>
 	<tr>
 	<td>
-	{% if dict['event_count'] == 0 %}
-	<button class="btn btn-mini btn-primary" type="button">{{dict['instance_count']}}</button>	
+	{% if dict['instance_count'] == 0 %}
+	<button class="btn btn-mini btn-danger" type="button">{{dict['instance_count']}}</button>	
 	{% else %}
 	<a href="/instance_events/{{dict['region']}}"><button class="btn btn-mini btn-primary" type="button">{{dict['instance_count']}}</button></a>
 	{% endif %}

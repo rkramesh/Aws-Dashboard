@@ -112,11 +112,26 @@ def instance_events(region=None):
         instance_event_list = []
         ec2 = boto3.resource('ec2', region_name=region)
         instances = ec2.instances.filter()
+        print instances
         for i in instances:
                 event_info = { 'instance_id' : i.id, 'State' : i.state['Name'], 'Region' : i.placement['AvailabilityZone'], 'Public_DNS' : i.public_ip_address, 'Private_DNS' : i.private_ip_address, 'Type': i.instance_type,'Name' : Ntag(i.tags) }
                 instance_event_list.append(event_info)
         instance_list = sorted(instance_event_list, key=lambda k: k['State'])
         return render_template('instance_events.html', instance_event_list=instance_list)
+
+@app.route('/instance_events/All/')
+def instance_events_all(region=None):
+        Ntag=(lambda x: 'Name not Assigned' if x is None else x[0]['Value'])
+        instance_event_list_all = []
+        for region in config.region_list():
+                ec2 = boto3.resource('ec2', region_name=region)
+                instances = ec2.instances.filter()
+                for i in instances:
+                        event_info_all = { 'instance_id' : i.id, 'State' : i.state['Name'], 'Region' : i.placement['AvailabilityZone'], 'Public_DNS' : i.public_ip_address, 'Private_DNS' : i.private_ip_address, 'Type': i.instance_type,'Name' : Ntag(i.tags) }
+                        instance_event_list_all.append(event_info_all)
+                        instance_list_all = sorted(instance_event_list_all, key=lambda k: k['State'])
+#        return render_template('instance_events_all.html', instance_event_list=instance_list_all)
+        return render_template('instance_events.html', instance_event_list=instance_list_all)
 			
 if __name__ == '__main__':
 	app.debug = True
