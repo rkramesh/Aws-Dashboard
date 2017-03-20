@@ -132,6 +132,18 @@ def instance_events_all(region=None):
                         instance_list_all = sorted(instance_event_list_all, key=lambda k: k['State'])
 #        return render_template('instance_events_all.html', instance_event_list=instance_list_all)
         return render_template('instance_events.html', instance_event_list=instance_list_all)
+
+@app.route('/instance_events_state/<region>')
+#@app.route("/instance_events_state/{{instance_event['Region']}}/{{instance_event['instance_id']}}")
+def instance_events_state(region=None):
+         conn = boto3.client('ec2',region_name=region.split(':')[0][:-1])
+         print ("Starting Instance ({}) ".format(region.split(':')[1]))
+         if region.split(':')[2]=='stopped':
+                 conn.start_instances(InstanceIds=[region.split(':')[1]]) 
+         else:
+                 conn.stop_instances(InstanceIds=[region.split(':')[1]]) 
+         return redirect(url_for('instance_events_all'))
+
 			
 if __name__ == '__main__':
 	app.debug = True
