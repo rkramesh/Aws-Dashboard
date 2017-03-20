@@ -139,8 +139,10 @@ def instance_events_state(region=None):
          conn = boto3.client('ec2',region_name=region.split(':')[0][:-1])
          print ("Starting Instance ({}) ".format(region.split(':')[1]))
          if region.split(':')[2]=='stopped':
+
                  conn.start_instances(InstanceIds=[region.split(':')[1]]) 
          else:
+
                  conn.stop_instances(InstanceIds=[region.split(':')[1]]) 
          return redirect(url_for('instance_events_all'))
 

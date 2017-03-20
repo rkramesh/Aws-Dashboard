@@ -34,9 +34,10 @@
 		</td>
 		<td>
                 {% if instance_event['State'] == 'stopped' %}
-                <a href="/instance_events_state/{{instance_event['Region']}}:{{instance_event['instance_id']}}:{{instance_event['State']}}"><button class="btn btn-mini btn-danger" type="button">{{instance_event['State']}}</button></a>
+	
+                <a href="/instance_events_state/{{instance_event['Region']}}:{{instance_event['instance_id']}}:{{instance_event['State']}}"><button class="btn btn-mini btn-danger" type="button" onclick="CheckIf();">{{instance_event['State']}}</button></a>
                 {% else %}
-                <a href="/instance_events_state/{{instance_event['Region']}}:{{instance_event['instance_id']}}:{{instance_event['State']}}"><button class="btn btn-mini btn-success" type="button">{{instance_event['State']}}</button></a>
+                <a href="/instance_events_state/{{instance_event['Region']}}:{{instance_event['instance_id']}}:{{instance_event['State']}}"><button class="btn btn-mini btn-success" type="button" onclick="CheckIfOk();">{{instance_event['State']}}</button></a>
                 {% endif %}
 		</td>
 		<td>
@@ -59,5 +60,31 @@
 		</table>
 	</div>
 </div>
+<script>
+function CheckIfOk() {
+	var x;
+    if (confirm("Are you sure you want to stop these instances ?" ) == true) {
+        x = "Please note that Any data on the ephemeral storage of your instances will be lost";
+		alert(x);
+
+    } else {
+       x = 'No Changes made to instance';
+	   alert(x);
+    }
+
+}
+function CheckIf() {
+	var x;
+    if (confirm("Are you sure you want to Start these instances ?" ) == true) {
+        x = "Starting Instances Now";
+		alert(x);
+
+    } else {
+       x = 'No Changes made to instance';
+	   alert(x);
+    }
+}
+
+</script>
 </body>
 </html>
