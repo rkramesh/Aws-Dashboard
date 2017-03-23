@@ -1,4 +1,7 @@
-from flask import Flask, flash, abort, redirect, url_for, request, render_template, make_response, json, Response
+from flask import Flask, flash, abort, redirect, url_for, request, render_template, make_response, json, Response,session
+
+#from utils import authenticate
+import authenticate
 import os, sys
 import config
 import boto.ec2.elb
@@ -6,57 +9,101 @@ import boto
 import boto3
 from boto.ec2 import *
 app = Flask(__name__)
-@app.route('/')
+app.secret_key = "Hello!"
+
+@app.route("/")
+@app.route("/welcome/")
+##def welcome ():
+##    if (len(session.keys()) > 0):
+##        return redirect(url_for('index',user = session['user']))
+##    else:
+##        return redirect(url_for('login'))
+@app.route("/home/")
+def home():
+    if (len(session.keys()) > 0):
+        return redirect(url_for('index',user = session['user']))
+    else:
+        return render_template('home.html')
+        
+@app.route("/login/")
+def login ():
+    if (len(session.keys()) > 0):
+        return render_template('index.html',user = session['user'])
+##    return render_template('home.html')
+    return redirect(url_for('home'))
+
+@app.route("/authenticate/", methods = ['POST']) #only post requests allowed
+def auth():
+    if (request.form['action'] == "login"):
+        out = authenticate.login(request.form['user'], request.form['password'])
+        if (out[1] == 1):
+            session['user'] = request.form['user']
+            return redirect(url_for('index'))
+        else:
+            return out[0]
+    elif (request.form['action'] == "register"):
+        return authenticate.register(request.form['user'], request.form['password'])
+
+@app.route("/logout/", methods = ['POST', 'GET'])
+def logout():
+    if (len(session.keys()) > 0):
+        session.pop('user')
+    return redirect(url_for('home'))
+
+@app.route('/index')
 def index():
-        list = []
-        creds = config.get_ec2_conf()
-        for region in config.region_list():
-                ec2 = boto3.client('ec2', region)
-                resp = ec2.describe_availability_zones()
-#                zones=[d['ZoneName'] for d in resp['AvailabilityZones'] if d['ZoneName']]
-                zones=[d for d in resp['AvailabilityZones'] if d['ZoneName']]
-                ec2 = boto3.resource('ec2', region_name=region)
-                instances = ec2.instances.filter()
-                instances=[i.id for i in instances]
-                ebs =[ volume for instance in ec2.instances.all() for volume in instance.volumes.all()]
-                ebscount = len(ebs)
-                instance_count = len(instances)
+        if (len(session.keys()) > 0):
                 
-                
-        ##		instance_count = len(instances)
-        ##		ebs = conn.get_all_volumes()
-        ##		ebscount = len(ebs)
-                unattached_ebs = 0
-                unattached_eli = 0
-        ##		event_count = 0
-        ##	
-        ##		for instance in instances:
-        ##			events = instance.events
-        ##			if events:
-        ##				event_count = event_count + 1	
+                list = []
+                creds = config.get_ec2_conf()
+                for region in config.region_list():
+                        ec2 = boto3.client('ec2', region)
+                        resp = ec2.describe_availability_zones()
+        #                zones=[d['ZoneName'] for d in resp['AvailabilityZones'] if d['ZoneName']]
+                        zones=[d for d in resp['AvailabilityZones'] if d['ZoneName']]
+                        ec2 = boto3.resource('ec2', region_name=region)
+                        instances = ec2.instances.filter()
+                        instances=[i.id for i in instances]
+                        ebs =[ volume for instance in ec2.instances.all() for volume in instance.volumes.all()]
+                        ebscount = len(ebs)
+                        instance_count = len(instances)
+                        
+                        
+                ##		instance_count = len(instances)
+                ##		ebs = conn.get_all_volumes()
+                ##		ebscount = len(ebs)
+                        unattached_ebs = 0
+                        unattached_eli = 0
+                ##		event_count = 0
+                ##	
+                ##		for instance in instances:
+                ##			events = instance.events
+                ##			if events:
+                ##				event_count = event_count + 1	
+                        ##
+                ##		for vol in ebs:
+                ##			state = vol.attachment_state()
+                ##			if state == None:
+                ##				unattached_ebs = unattached_ebs + 1
                 ##
-        ##		for vol in ebs:
-        ##			state = vol.attachment_state()
-        ##			if state == None:
-        ##				unattached_ebs = unattached_ebs + 1
-        ##
-        ##		elis = conn.get_all_addresses()
-        ##		eli_count = len(elis)
-        ##
-        ##
-        ##		for eli in elis:
-        ##			instance_id = eli.instance_id
-        ##			if not instance_id:
-        ##				unattached_eli = unattached_eli + 1
-        ##
-        ##		connelb = boto.ec2.elb.connect_to_region(region, aws_access_key_id=creds['AWS_ACCESS_KEY_ID'], aws_secret_access_key=creds['AWS_SECRET_ACCESS_KEY'])
-        ##		elb = connelb.get_all_load_balancers()
-        ##		elb_count = len(elb)
-        ##		list.append({ 'region' : region, 'zones': zones, 'instance_count' : instance_count, 'ebscount' : ebscount, 'unattached_ebs' : unattached_ebs, 'eli_count' : eli_count, 'unattached_eli' : unattached_eli, 'elb_count' : elb_count, 'event_count' : event_count})
-                list.append({ 'region' : region, 'zones': zones, 'instance_count' : instance_count, 'unattached_ebs' : unattached_ebs, 'unattached_eli' : unattached_eli})
-        ##		
-        return render_template('index.html',list=list)
-##        return 'hi'       
+                ##		elis = conn.get_all_addresses()
+                ##		eli_count = len(elis)
+                ##
+                ##
+                ##		for eli in elis:
+                ##			instance_id = eli.instance_id
+                ##			if not instance_id:
+                ##				unattached_eli = unattached_eli + 1
+                ##
+                ##		connelb = boto.ec2.elb.connect_to_region(region, aws_access_key_id=creds['AWS_ACCESS_KEY_ID'], aws_secret_access_key=creds['AWS_SECRET_ACCESS_KEY'])
+                ##		elb = connelb.get_all_load_balancers()
+                ##		elb_count = len(elb)
+                ##		list.append({ 'region' : region, 'zones': zones, 'instance_count' : instance_count, 'ebscount' : ebscount, 'unattached_ebs' : unattached_ebs, 'eli_count' : eli_count, 'unattached_eli' : unattached_eli, 'elb_count' : elb_count, 'event_count' : event_count})
+                        list.append({ 'region' : region, 'zones': zones, 'instance_count' : instance_count, 'unattached_ebs' : unattached_ebs, 'unattached_eli' : unattached_eli})
+                ##		
+                return render_template('index.html',list=list)
+        else:
+                return redirect(url_for('login'))
 
 @app.route('/ebs_volumes/<region>/')
 def ebs_volumes(region=None):
@@ -149,4 +196,4 @@ def instance_events_state(region=None):
 			
 if __name__ == '__main__':
 	app.debug = True
-	app.run(host='0.0.0.0',port=8443)
+	app.run(host='0.0.0.0',port=9000)
