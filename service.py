@@ -9,8 +9,7 @@ import boto
 import boto3
 from boto.ec2 import *
 app = Flask(__name__)
-app.secret_key = "Hello!"
-
+app.secret_key = "Hello"
 @app.route("/")
 @app.route("/welcome/")
 ##def welcome ():
@@ -36,11 +35,15 @@ def login ():
 def auth():
     if (request.form['action'] == "login"):
         out = authenticate.login(request.form['user'], request.form['password'])
-        if (out[1] == 1):
-            session['user'] = request.form['user']
-            return redirect(url_for('index'))
-        else:
-            return out[0]
+        try:
+            if (out[1] == 1):
+                session['user'] = request.form['user']
+                return redirect(url_for('index'))
+        except:
+##                return redirect(url_for('home'))
+##                    return redirect(url_for('home', out='foo'))
+                    return render_template('home.html',out='Rocky')
+
     elif (request.form['action'] == "register"):
         return authenticate.register(request.form['user'], request.form['password'])
 
